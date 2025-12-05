@@ -33,7 +33,7 @@ def draw(
 
     draw_perf_stats(graphics, sim_rate, fps, state.fill_fraction)
 
-    if is_right_wall_on_fire(state):
+    if state.right_wall_on_fire():
         goal_font = pygame.font.Font(None, 96)
         goal_surface = goal_font.render("GOAL", True, (255, 255, 255))
         goal_rect = goal_surface.get_rect()
@@ -176,14 +176,3 @@ def draw_demo(surface):
         )
 
     pygame.draw.circle(surface, (0, 255, 0), mouse_pos(), 10)
-
-
-def is_right_wall_on_fire(state: State) -> bool:
-    grid = state.current
-    if not grid or not grid[0]:
-        return False
-    last_col = len(grid[0]) - 1
-    for row in grid:
-        if row[last_col] == 2:
-            return True
-    return False

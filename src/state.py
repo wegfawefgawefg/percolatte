@@ -3,7 +3,12 @@ import glm
 import random
 from typing import Optional
 
-from src.settings import GRID_DIMS
+from src.settings import (
+    GRID_DIMS,
+    AUTO_TUNE_INITIAL_STEP,
+    AUTO_TUNE_MIN_STEP,
+    AUTO_TUNE_MAX_ITERATIONS,
+)
 
 
 # each cell has three states, empty: 0, tree: 1, fire: 2
@@ -18,8 +23,11 @@ class State:
         self.current: list[list[int]] = self.grid_a
         self.next: list[list[int]] = self.grid_b
 
-        self.fill_fraction: float = 0.5
+        self.fill_fraction: float = 0.59274621
         self.last_seed: int = 0
+        self.auto_min_step = AUTO_TUNE_MIN_STEP
+        self.auto_max_iterations = AUTO_TUNE_MAX_ITERATIONS
+        self.reset_auto_tune()
 
     def make_grid(self) -> list[list[int]]:
         return [[0 for _ in range(int(GRID_DIMS.x))] for _ in range(int(GRID_DIMS.y))]
@@ -34,6 +42,21 @@ class State:
     def set_fill_fraction(self, value: float):
         value = max(0.0, min(1.0, value))
         self.fill_fraction = value
+
+    def reset_auto_tune(self):
+        self.auto_step: float = AUTO_TUNE_INITIAL_STEP
+        self.auto_last_direction: int = 0
+        self.auto_seed_counter: int = 1
+        self.auto_flip_count: int = 0
+
+    def right_wall_on_fire(self) -> bool:
+        if not self.current or not self.current[0]:
+            return False
+        last_col = len(self.current[0]) - 1
+        for row in self.current:
+            if row[last_col] == 2:
+                return True
+        return False
 
 
 def init_grid(state: State, seed: int, fill_fraction: Optional[float] = None):
