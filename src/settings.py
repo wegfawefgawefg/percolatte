@@ -1,7 +1,7 @@
 import glm
 
 # sim
-SIMULATION_FPS = 60.0  # 480.0
+SIMULATION_FPS = 1000.0  # 480.0
 SIM_DT = 1.0 / SIMULATION_FPS
 
 # rendering
@@ -12,3 +12,4 @@ WINDOW_DIMS = glm.vec2(1600, 800)
 DIMS = WINDOW_DIMS / 2
 
 GRID_DIMS = glm.ivec2(32, 32)
+DENSITY_DELTA_PER_PRESS = 0.00001

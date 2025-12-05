@@ -15,7 +15,7 @@ def main():
     state = State()
     graphics = Graphics()
 
-    init_grid(state, seed=0, fill_fraction=0.5)
+    init_grid(state, seed=0)
 
     accumulator = 0.0
     last_time = pygame.time.get_ticks() / 1000.0
@@ -33,11 +33,12 @@ def main():
         if not state.paused:
             accumulator += frame_time
 
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        for event in events:
             if event.type == pygame.QUIT:
                 state.running = False
 
-        do_inputs(state)
+        do_inputs(state, events)
 
         if not state.paused:
             while accumulator >= SIM_DT:

@@ -31,7 +31,22 @@ def draw(
 
     draw_grid_coords_under_mouse(state, graphics, grid_pos, grid_size, mpos)
 
-    draw_perf_stats(graphics, sim_rate, fps)
+    draw_perf_stats(graphics, sim_rate, fps, state.fill_fraction)
+
+    if is_right_wall_on_fire(state):
+        goal_font = pygame.font.Font(None, 96)
+        goal_surface = goal_font.render("GOAL", True, (255, 255, 255))
+        goal_rect = goal_surface.get_rect()
+        goal_rect.top = 40
+        goal_rect.centerx = graphics.render_surface.get_width() // 2
+        graphics.render_surface.blit(goal_surface, goal_rect)
+
+    if state.paused:
+        pause_surface = graphics.font.render("PAUSE", True, (255, 0, 0))
+        pause_rect = pause_surface.get_rect()
+        pause_rect.top = 2
+        pause_rect.right = graphics.render_surface.get_width() - 2
+        graphics.render_surface.blit(pause_surface, pause_rect)
 
     stretched_surface = pygame.transform.scale(graphics.render_surface, WINDOW_DIMS)
     graphics.window.blit(stretched_surface, (0, 0))
@@ -65,7 +80,7 @@ def draw_grid_coords_under_mouse(
     graphics.render_surface.blit(text, (pos.x, pos.y))
 
 
-def draw_perf_stats(graphics, sim_rate, fps):
+def draw_perf_stats(graphics, sim_rate, fps, density):
     def fmt_line(label, current, target):
         percent = 0.0
         if target:
@@ -82,6 +97,12 @@ def draw_perf_stats(graphics, sim_rate, fps):
         text_surface = graphics.font.render(line, True, (255, 255, 255))
         graphics.render_surface.blit(text_surface, (2, y))
         y += text_surface.get_height() + 2
+
+    density_text = graphics.font.render(f"Density: {density:.8f}", True, (255, 255, 255))
+    density_rect = density_text.get_rect()
+    density_rect.left = 2
+    density_rect.bottom = graphics.render_surface.get_height() - 2
+    graphics.render_surface.blit(density_text, density_rect)
 
 
 def draw_grid(state, graphics, pos: glm.vec2, size: glm.vec2):
@@ -155,3 +176,14 @@ def draw_demo(surface):
         )
 
     pygame.draw.circle(surface, (0, 255, 0), mouse_pos(), 10)
+
+
+def is_right_wall_on_fire(state: State) -> bool:
+    grid = state.current
+    if not grid or not grid[0]:
+        return False
+    last_col = len(grid[0]) - 1
+    for row in grid:
+        if row[last_col] == 2:
+            return True
+    return False

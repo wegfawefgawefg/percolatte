@@ -1,6 +1,7 @@
 import pygame
 import glm
 import random
+from typing import Optional
 
 from src.settings import GRID_DIMS
 
@@ -17,6 +18,9 @@ class State:
         self.current: list[list[int]] = self.grid_a
         self.next: list[list[int]] = self.grid_b
 
+        self.fill_fraction: float = 0.5
+        self.last_seed: int = 0
+
     def make_grid(self) -> list[list[int]]:
         return [[0 for _ in range(int(GRID_DIMS.x))] for _ in range(int(GRID_DIMS.y))]
 
@@ -27,8 +31,16 @@ class State:
         self.current = self.make_grid()
         self.next = self.make_grid()
 
+    def set_fill_fraction(self, value: float):
+        value = max(0.0, min(1.0, value))
+        self.fill_fraction = value
 
-def init_grid(state: State, seed: int, fill_fraction: float = 0.5):
+
+def init_grid(state: State, seed: int, fill_fraction: Optional[float] = None):
+    state.last_seed = seed
+    if fill_fraction is not None:
+        state.set_fill_fraction(fill_fraction)
+    fill_fraction = state.fill_fraction
     random.seed(seed)
 
     for y in range(GRID_DIMS.y):
